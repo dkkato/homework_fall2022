@@ -116,7 +116,7 @@ class PGAgent(BaseAgent):
                 advantages = np.zeros(batch_size + 1)
                 Sum = 0
                 for i in reversed(range(batch_size)):
-                    ## TODO: recursively compute advantage estimates starting from
+                    ## TOD: recursively compute advantage estimates starting from
                         ## timestep T.
                     ## HINT: use terminals to handle edge cases. terminals[i]
                         ## is 1 if the state is the last in its trajectory, and
@@ -138,7 +138,7 @@ class PGAgent(BaseAgent):
         # Normalize the resulting advantages to have a mean of zero
         # and a standard deviation of one
         if self.standardize_advantages:
-            advantages = normalize(advantages,np.mean(advantages),np.std(advantages))
+            advantages = normalize(advantages,np.mean(advantages),np.std(advantages),eps=1e-4)
 
         return advantages
 
@@ -182,7 +182,7 @@ class PGAgent(BaseAgent):
         rew = np.flip(rewards)
         Sum = 0;
         for p, r in enumerate(rew):
-            Sum += (self.gamma * Sum) + r
+            Sum = (self.gamma * Sum) + r
             list_of_discounted_cumsums.append(Sum)
         list_of_discounted_cumsums = np.flip(list_of_discounted_cumsums)
 
