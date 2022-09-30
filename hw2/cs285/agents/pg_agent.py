@@ -97,6 +97,7 @@ class PGAgent(BaseAgent):
             values_unnormalized = self.actor.run_baseline_prediction(obs)
             ## ensure that the value predictions and q_values have the same dimensionality
             ## to prevent silent broadcasting errors
+            q_values = np.concatenate(q_values)
             assert values_unnormalized.ndim == q_values.ndim
             ## TOD: values were trained with standardized q_values, so ensure
                 ## that the predictions have the same mean and standard deviation as
@@ -121,7 +122,14 @@ class PGAgent(BaseAgent):
                     ## HINT: use terminals to handle edge cases. terminals[i]
                         ## is 1 if the state is the last in its trajectory, and
                         ## 0 otherwise.
-                    advantages[i] = rews[i] + self.gamma*((1-self.gae_lambda)*values[i+1]+advantages[i+1]*self.gae_lambda)
+                    #advantages[i] = rews[i] + self.gamma*((1-self.gae_lambda)*values[i+1]+advantages[i+1]*self.gae_lambda)
+                    if terminals[i]:
+                        advantages[i]=0
+                        continue
+                    deltat = rews[i] + self.gamma*values[i]-values[i]
+                    advantages[i] = deltat + self.gamma*self.gae_lambda*advantages[i+1]
+
+
 
 
                 # remove dummy advantage
