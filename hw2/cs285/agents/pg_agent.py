@@ -97,7 +97,6 @@ class PGAgent(BaseAgent):
             values_unnormalized = self.actor.run_baseline_prediction(obs)
             ## ensure that the value predictions and q_values have the same dimensionality
             ## to prevent silent broadcasting errors
-            q_values = np.concatenate(q_values)
             assert values_unnormalized.ndim == q_values.ndim
             ## TOD: values were trained with standardized q_values, so ensure
                 ## that the predictions have the same mean and standard deviation as
