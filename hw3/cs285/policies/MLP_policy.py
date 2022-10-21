@@ -86,8 +86,16 @@ class MLPPolicy(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
 
     # query the policy with observation(s) to get selected action(s)
     def get_action(self, obs: np.ndarray) -> np.ndarray:
-        # TODO: get this from hw1 or hw2
-        return action
+        if len(obs.shape) > 1:
+            observation = obs
+        else:
+            observation = obs[None]
+
+        observation = ptu.from_numpy(observation)
+        action_distribution = self.forward(observation)
+        action = action_distribution.sample()  # don't bother with rsample
+        return ptu.to_numpy(action)
+
 
     # update/train this policy
     def update(self, observations, actions, **kwargs):
@@ -99,8 +107,21 @@ class MLPPolicy(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
     # return more flexible objects, such as a
     # `torch.distributions.Distribution` object. It's up to you!
     def forward(self, observation: torch.FloatTensor):
-        # TODO: get this from hw1 or hw2
-        return action_distribution
+
+        if self.discrete:
+            logits = self.logits_na(observation)
+            action_distribution = distributions.Categorical(logits=logits)
+            return action_distribution
+        else:
+            batch_mean = self.mean_net(observation)
+            scale_tril = torch.diag(torch.exp(self.logstd))
+            batch_dim = batch_mean.shape[0]
+            batch_scale_tril = scale_tril.repeat(batch_dim, 1, 1)
+            action_distribution = distributions.MultivariateNormal(
+                batch_mean,
+                scale_tril=batch_scale_tril,
+            )
+            return action_distribution
 
 
 #####################################################
@@ -108,6 +129,59 @@ class MLPPolicy(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
 
 
 class MLPPolicyAC(MLPPolicy):
+    def __init__(self, ac_dim, ob_dim, n_layers, size, **kwargs):
+
+        super().__init__(ac_dim, ob_dim, n_layers, size, **kwargs)
+        self.baseline_loss = nn.MSELoss()
+
     def update(self, observations, actions, adv_n=None):
-        # TODO: update the policy and return the loss
+        observations = ptu.from_numpy(observations)
+        actions = ptu.from_numpy(actions)
+        advantages = ptu.from_numpy(advantages)
+
+        # TOD: update the policy using policy gradient
+        # HINT1: Recall that the expression that we want to MAXIMIZE
+        # is the expectation over collected trajectories of:
+        # sum_{t=0}^{T-1} [grad [log pi(a_t|s_t) * (Q_t - b_t)]]
+        # HINT2: you will want to use the `log_prob` method on the distribution returned
+        # by the `forward` method
+        prob = self.forward(observations)
+        loss = -torch.mean(prob.log_prob(actions) * advantages)
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
+
+        if self.nn_baseline:
+            ## TOD: update the neural network baseline using the q_values as
+            ## targets. The q_values should first be normalized to have a mean
+            ## of zero and a standard deviation of one.
+            normq = normalize(q_values, np.mean(q_values), np.std(q_values))
+            normq = ptu.from_numpy(normq)
+
+            ## Note: You will need to convert the targets into a tensor using
+            ## ptu.from_numpy before using it in the loss
+
+            pred = self.baseline.forward(observations)
+            pred = pred.squeeze()
+            loss_nn_baseline = F.mse_loss(normq, pred)
+            self.baseline_optimizer.zero_grad()
+            loss_nn_baseline.backward()
+            self.baseline_optimizer.step()
+
+        train_log = {
+            'Training Loss': ptu.to_numpy(loss),
+        }
         return loss.item()
+    def run_baseline_prediction(self, observations):
+        """
+            Helper function that converts `observations` to a tensor,
+            calls the forward method of the baseline MLP,
+            and returns a np array
+
+            Input: `observations`: np.ndarray of size [N, 1]
+            Output: np.ndarray of size [N]
+
+        """
+        observations = ptu.from_numpy(observations)
+        pred = self.baseline(observations)
+        return ptu.to_numpy(pred.squeeze())
