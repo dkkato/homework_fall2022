@@ -4,6 +4,7 @@ from cs285.critics.bootstrapped_continuous_critic import \
     BootstrappedContinuousCritic
 from cs285.infrastructure.replay_buffer import ReplayBuffer
 from cs285.infrastructure.utils import *
+import cs285.infrastructure.pytorch_util as ptu
 from cs285.policies.MLP_policy import MLPPolicyAC
 from .base_agent import BaseAgent
 
@@ -23,8 +24,8 @@ class ACAgent(BaseAgent):
             self.agent_params['ob_dim'],
             self.agent_params['n_layers'],
             self.agent_params['size'],
-            self.agent_params['discrete'],
-            self.agent_params['learning_rate'],
+            discrete=self.agent_params['discrete'],
+            learning_rate=self.agent_params['learning_rate'],
         )
         self.critic = BootstrappedContinuousCritic(self.agent_params)
 

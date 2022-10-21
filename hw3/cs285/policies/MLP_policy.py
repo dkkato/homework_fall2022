@@ -137,7 +137,7 @@ class MLPPolicyAC(MLPPolicy):
     def update(self, observations, actions, adv_n=None):
         observations = ptu.from_numpy(observations)
         actions = ptu.from_numpy(actions)
-        advantages = ptu.from_numpy(advantages)
+        advantages = ptu.from_numpy(adv_n)
 
         # TOD: update the policy using policy gradient
         # HINT1: Recall that the expression that we want to MAXIMIZE
