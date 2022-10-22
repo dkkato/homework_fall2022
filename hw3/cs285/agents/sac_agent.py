@@ -57,7 +57,11 @@ class SACAgent(BaseAgent):
         # TODO 
         # 1. Implement the following pseudocode:
         # for agent_params['num_critic_updates_per_agent_update'] steps,
+        for _ in range(agent_params['num_critic_updates_per_agent_update']):
         #     update the critic
+            self.update_critic(ob_no, ac_na, re_n, next_ob_no, terminal_n)
+
+
 
         # 2. Softly update the target every critic_target_update_frequency (HINT: look at sac_utils)
 
