@@ -1,10 +1,7 @@
 from collections import OrderedDict
 
-from cs285.critics.bootstrapped_continuous_critic import \
-    BootstrappedContinuousCritic
 from cs285.infrastructure.replay_buffer import ReplayBuffer
 from cs285.infrastructure.utils import *
-from cs285.policies.MLP_policy import MLPPolicyAC
 from .base_agent import BaseAgent
 import gym
 from cs285.policies.sac_policy import MLPPolicySAC
@@ -45,50 +42,12 @@ class SACAgent(BaseAgent):
         self.training_step = 0
         self.replay_buffer = ReplayBuffer(max_size=100000)
 
-    def update_critic(self, ob_no, ac_na, next_ob_no, re_n, terminal_n):
-        # TODO: 
-        # 1. Compute the target Q value. 
-        # HINT: You need to use the entropy term (alpha)
-        # 2. Get current Q estimates and calculate critic loss
-        # 3. Optimize the critic
-
-
+    def update_critic(self):
+        # TODO: get this from previous HW  
         return critic_loss
 
     def train(self, ob_no, ac_na, re_n, next_ob_no, terminal_n):
-        # TOD
-        # 1. Implement the following pseudocode:
-        # for agent_params['num_critic_updates_per_agent_update'] steps,
-        # 2. Softly update the target every critic_target_update_frequency (HINT: look at sac_utils)
-        for i in range(agent_params['num_critic_updates_per_agent_update']):
-        #     update the critic
-            critic_loss = self.update_critic(ob_no, ac_na, re_n, next_ob_no, terminal_n)
-            if i % self.critic_target_update_frequency == 0:
-                soft_update_params(self.critic, self.critic_target, self.critic_tau)
-
-
-
-        for step in range(self.agent_params['num_actor_updates_per_agent_update']):
-            actor_loss, alpha_loss, alph = self.actor.update(ob_no, self.critic)
-
-
-
-
-        # 2. Softly update the target every critic_target_update_frequency (HINT: look at sac_utils)
-
-        # 3. Implement following pseudocode:
-        # If you need to update actor
-        # for agent_params['num_actor_updates_per_agent_update'] steps,
-        #     update the actor
-
-
-        # 4. gather losses for logging
-        loss = OrderedDict()
-        loss['Critic_Loss'] = critic_loss
-        loss['Actor_Loss'] = actor_loss
-        loss['Alpha_Loss'] = alpha_loss
-        loss['Temperature'] = alph
-
+        # TODO: get this from previous HW
         return loss
 
     def add_to_replay_buffer(self, paths):

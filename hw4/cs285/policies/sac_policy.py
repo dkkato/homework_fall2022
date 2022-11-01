@@ -35,19 +35,11 @@ class MLPPolicySAC(MLPPolicy):
 
     @property
     def alpha(self):
-        entropy = torch.exp(self.log_alpha)
+        # TODO: get this from previous HW
         return entropy
 
     def get_action(self, obs: np.ndarray, sample=True) -> np.ndarray:
-        # TODO: return sample from distribution if sampling
-        # if not sampling return the mean of the distribution
-
-        obs = ptu.from_numpy(obs)
-        if sample:
-            action = self
-        else:
-            action = 0
-
+        # TODO: get this from previous HW
         return action
 
     # This function defines the forward pass of the network.
@@ -56,15 +48,9 @@ class MLPPolicySAC(MLPPolicy):
     # return more flexible objects, such as a
     # `torch.distributions.Distribution` object. It's up to you!
     def forward(self, observation: torch.FloatTensor):
-        # TODO: Implement pass through network, computing logprobs and apply correction for Tanh squashing
-
-        # HINT: 
-        # You will need to clip log values
-        # You will need SquashedNormal from sac_utils file 
+        # TODO: get this from previous HW
         return action_distribution
 
     def update(self, obs, critic):
-        # TODO Update actor network and entropy regularizer
-        # return losses and alpha value
-
+        # TODO: get this from previous HW
         return actor_loss, alpha_loss, self.alpha

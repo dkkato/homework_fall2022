@@ -55,11 +55,7 @@ class SACCritic(nn.Module, BaseCritic):
         )
 
     def forward(self, obs: torch.Tensor, action: torch.Tensor):
-        # TOD return the two q values
-        obsact = torch.cat((obs,action), dim=1)
-        Q1 = self.Q1(obsact)
-        Q2 = self.Q2(obsact)
-        values = (Q1,Q2)
+        # TODO: get this from previous HW
         return values
 
 
