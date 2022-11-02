@@ -57,6 +57,8 @@ class MB_Trainer(object):
 def main():
 
     import argparse
+    import os
+    os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
     parser = argparse.ArgumentParser()
     parser.add_argument('--env_name', type=str) #reacher-cs285-v0, ant-cs285-v0, cheetah-cs285-v0, obstacles-cs285-v0
     parser.add_argument('--ep_len', type=int, default=200)
